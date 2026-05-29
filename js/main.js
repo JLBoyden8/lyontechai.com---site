@@ -23,50 +23,59 @@
       }
     });
   }
+})();
 
+(function () {
   var form = document.getElementById("demo-form");
-  if (form) {
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+  var submitBtn = form ? form.querySelector('[type="submit"]') : null;
 
-      var get = function (id) {
-        var el = document.getElementById(id);
-        return el ? (el.value || "").trim() : "";
-      };
+  if (!form || !submitBtn) return;
 
-      var name = get("demo-name");
-      var business = get("demo-business");
-      var phone = get("demo-phone");
-      var email = get("demo-email");
-      var industry = get("demo-industry");
-      var message = get("demo-message");
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
 
-      var subject = "Demo Request — " + (business || "LyonTech AI");
-      var bodyLines = [
-        "Name: " + name,
-        "Business: " + business,
-        "Phone: " + phone,
-        "Email: " + email,
-        "Industry: " + industry,
-        "",
-        "Message:",
-        message
-      ];
-      var body = bodyLines.join("\n");
+    var formData = new FormData(form);
+    var data = Object.fromEntries(formData);
 
-      var mailto =
-        "mailto:jack.lyontech@gmail.com" +
-        "?subject=" + encodeURIComponent(subject) +
-        "&body=" + encodeURIComponent(body);
+    submitBtn.disabled = true;
+    var originalText = submitBtn.textContent;
+    submitBtn.textContent = "Sending…";
 
-      var confirmation = document.createElement("div");
-      confirmation.className = "form-confirmation";
-      confirmation.innerHTML =
-        'Thanks — your email client should open. Or reach us directly at ' +
-        '<a href="mailto:jack.lyontech@gmail.com">jack.lyontech@gmail.com</a>.';
-      form.replaceWith(confirmation);
-
-      window.location.href = mailto;
+    fetch("https://api.web3forms.com/submit", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Accept": "application/json"
+      },
+      body: JSON.stringify(data)
+    })
+    .then(function (response) {
+      return response.json();
+    })
+    .then(function (result) {
+      if (result.success) {
+        form.innerHTML = '<div style="text-align:center;padding:2rem;"><h2 style="font-family:var(--font-display);font-size:1.5rem;font-weight:700;text-transform:uppercase;margin-bottom:1rem;color:var(--text);">REQUEST RECEIVED</h2><p style="color:var(--text-muted);font-size:1rem;line-height:1.6;">Thanks — we\'ll be in touch within one business day. Need us sooner? Email <a href="mailto:jack.lyontech@gmail.com" style="color:var(--accent);">jack.lyontech@gmail.com</a> or call/text directly.</p></div>';
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+        var errorMsg = document.createElement("div");
+        errorMsg.style.color = "var(--accent)";
+        errorMsg.style.marginTop = "1rem";
+        errorMsg.style.fontSize = "0.9375rem";
+        errorMsg.textContent = "Something went wrong. Please email jack.lyontech@gmail.com directly.";
+        form.appendChild(errorMsg);
+      }
+    })
+    .catch(function (error) {
+      console.error("Error:", error);
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
+      var errorMsg = document.createElement("div");
+      errorMsg.style.color = "var(--accent)";
+      errorMsg.style.marginTop = "1rem";
+      errorMsg.style.fontSize = "0.9375rem";
+      errorMsg.textContent = "Something went wrong. Please email jack.lyontech@gmail.com directly.";
+      form.appendChild(errorMsg);
     });
-  }
+  });
 })();

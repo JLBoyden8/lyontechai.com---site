@@ -690,6 +690,27 @@ section {
   color: var(--accent);
 }
 
+.form-confirmation__heading {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 0.75rem;
+}
+
+.form-error {
+  margin-top: 1rem;
+  color: var(--accent);
+  font-size: 0.9375rem;
+}
+
+.form-error a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
 /* CTA band */
 .cta-band {
   padding: 5rem 0;
