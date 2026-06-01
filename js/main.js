@@ -31,11 +31,29 @@
 
   if (!form || !submitBtn) return;
 
+  var industrySelect = document.getElementById("demo-industry");
+  var otherField = document.getElementById("industry-other-field");
+  var otherInput = document.getElementById("demo-industry-other");
+
+  if (industrySelect && otherField && otherInput) {
+    industrySelect.addEventListener("change", function () {
+      var isOther = industrySelect.value === "Other";
+      otherField.style.display = isOther ? "" : "none";
+      otherInput.disabled = !isOther;
+      if (isOther) otherInput.focus();
+    });
+  }
+
   form.addEventListener("submit", function (e) {
     e.preventDefault();
 
     var formData = new FormData(form);
     var data = Object.fromEntries(formData);
+
+    if (data.industry === "Other" && data.industry_other) {
+      data.industry = data.industry_other;
+    }
+    delete data.industry_other;
 
     submitBtn.disabled = true;
     var originalText = submitBtn.textContent;
